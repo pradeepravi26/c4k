@@ -25,7 +25,7 @@ class User(BaseModel):
     full_name = CharField()
     preferred_name = CharField()
     c4k_id = CharField()
-    role = CharField(choices=["student", "volunteer", "guest"])
+    role = CharField(choices=["student", "volunteer", "unassigned"])
     is_active = BooleanField(default=True)
 
     class Meta:
@@ -41,18 +41,3 @@ class MemberVisit(BaseModel):
 
     class Meta:
         table_name = "member_visits"
-
-
-if __name__ == "__main__":
-    db.connect()
-    # db.drop_tables([User, MemberVisit], safe=True)
-    # db.create_tables([User, MemberVisit], safe=True)
-
-    # User.create(
-    #     full_name="John Doe",
-    #     preferred_name="Johnny",
-    #     c4k_id="123456",
-    #     role="student",
-    #     is_active=True,
-    # )
-    db.close()
