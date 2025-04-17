@@ -6,19 +6,34 @@ import { Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+interface Student {
+  id: string;
+  full_name: string;
+  preferred_name: string | null;
+  c4k_id: string;
+  role: string;
+  is_active: boolean;
+}
+
 export default function StudentCheckInSearch() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [allStudents, setAllStudents] = useState([]);
+  const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch all users with role=student
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(true);
       try {
         const res = await fetch("http://localhost:8000/users?role=student");
         const data = await res.json();
-        setAllStudents(data);
+
+        // Ensure it's an array
+        if (Array.isArray(data)) {
+          setAllStudents(data);
+        } else {
+          console.error("Invalid response format", data);
+          setAllStudents([]);
+        }
       } catch (error) {
         console.error("Failed to fetch students", error);
         setAllStudents([]);
@@ -30,9 +45,8 @@ export default function StudentCheckInSearch() {
     fetchStudents();
   }, []);
 
-  // Filter on the frontend
-  const filteredStudents = allStudents.filter((student: any) =>
-    student.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStudents = allStudents.filter((student: Student) =>
+    (student?.full_name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -68,7 +82,7 @@ export default function StudentCheckInSearch() {
         {/* Grid of student names */}
         {filteredStudents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filteredStudents.map((student: any) => (
+            {filteredStudents.map((student: Student) => (
               <Link
                 key={student.id}
                 href={`/student/check-in/${student.id}`}
@@ -80,10 +94,11 @@ export default function StudentCheckInSearch() {
                 >
                   <div className="flex flex-col items-start">
                     <span className="text-lg font-medium">
-                      {student.preferred_name || student.full_name}
+                      {student.preferred_name || student.full_name || "Unnamed"}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      {student.c4k_id} &middot; {student.full_name}
+                      {student.c4k_id || "N/A"} &middot;{" "}
+                      {student.full_name || "N/A"}
                     </span>
                   </div>
                 </Button>

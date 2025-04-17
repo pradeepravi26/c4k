@@ -25,8 +25,16 @@ if csv_file != st.session_state.csv_file:
 
 if csv_file is not None:
     df = pd.read_csv(csv_file, header=None)
-    df.columns = ["Full Name", "Preferred Name", "C4K ID"]
-    st.dataframe(df)
+    # df.columns = ["Full Name", "Preferred Name", "C4K ID"]
+    df.columns = ["full_name", "preferred_name", "c4k_id"]
+    st.dataframe(
+        df,
+        column_config={
+            "c4k_id": st.column_config.TextColumn("C4K ID"),
+            "full_name": st.column_config.TextColumn("Full Name"),
+            "preferred_name": st.column_config.TextColumn("Preferred Name"),
+        },
+    )
 
     if st.button("Validate", use_container_width=True):
         csv_users = df.to_dict(orient="records")
