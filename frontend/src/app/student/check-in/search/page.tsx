@@ -24,7 +24,9 @@ export default function StudentCheckInSearch() {
     const fetchStudents = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8000/users?role=student");
+        const res = await fetch(
+          "http://localhost:8000/users/check-in/?role=student"
+        );
         const data = await res.json();
 
         // Ensure it's an array
