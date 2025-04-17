@@ -40,6 +40,10 @@ date_range = st.date_input(
     label_visibility="collapsed",
 )
 
+if len(date_range) == 2:
+    st.session_state["start_date"] = date_range[0]
+    st.session_state["end_date"] = date_range[1]
+
 if st.session_state["start_date"] and st.session_state["end_date"] and user_roles:
     visits_query = (
         MemberVisit.select(MemberVisit, User)
@@ -52,7 +56,6 @@ if st.session_state["start_date"] and st.session_state["end_date"] and user_role
         .order_by(MemberVisit.in_time.desc())
     )
 
-    # Prepare data for display
     if visits_query.exists():
         visits_data = [
             {
@@ -73,7 +76,6 @@ if st.session_state["start_date"] and st.session_state["end_date"] and user_role
 
         st.subheader("Member Visits")
         st.dataframe(visits_data, height=1000)
-
     else:
         st.info("No member visits found for the selected filters.")
 else:
