@@ -45,9 +45,15 @@ export default function StudentCheckInSearch() {
     fetchStudents();
   }, []);
 
-  const filteredStudents = allStudents.filter((student: Student) =>
-    (student?.full_name || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStudents = allStudents.filter((student: Student) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      (student.full_name && student.full_name.toLowerCase().includes(search)) ||
+      (student.preferred_name &&
+        student.preferred_name.toLowerCase().includes(search)) ||
+      (student.c4k_id && student.c4k_id.toLowerCase().includes(search))
+    );
+  });
 
   return (
     <div className="flex min-h-screen flex-col bg-background p-4">
