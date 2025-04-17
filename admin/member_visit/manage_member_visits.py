@@ -3,6 +3,7 @@ from orm import MemberVisit, User
 import datetime
 from peewee import fn
 import time
+import pandas as pd
 
 if "start_date" not in st.session_state:
     st.session_state["start_date"] = datetime.datetime.now().date()
@@ -10,7 +11,21 @@ if "start_date" not in st.session_state:
 if "end_date" not in st.session_state:
     st.session_state["end_date"] = datetime.datetime.now().date()
 
-st.title("Manage Member Visits")
+if "visits_data" not in st.session_state:
+    st.session_state["visits_data"] = "No data available"
+
+col1, col2 = st.columns([5, 1], vertical_alignment="bottom")
+with col1:
+    st.title("Manage Member Visits")
+with col2:
+    st.download_button(
+        label="Download CSV",
+        data=st.session_state["visits_data"],
+        file_name="data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        use_container_width=True,
+    )
 
 user_roles = st.multiselect(
     "Select User Type",
@@ -24,13 +39,6 @@ date_range = st.date_input(
     value=(st.session_state["start_date"], st.session_state["end_date"]),
     label_visibility="collapsed",
 )
-
-if len(date_range) == 2:
-    st.session_state["start_date"] = date_range[0]
-    st.session_state["end_date"] = date_range[1]
-
-if len(date_range) == 1:
-    st.info("If you want to select a single date, please select the same date twice.")
 
 if st.session_state["start_date"] and st.session_state["end_date"] and user_roles:
     visits_query = (
@@ -61,9 +69,11 @@ if st.session_state["start_date"] and st.session_state["end_date"] and user_role
             for visit in visits_query
         ]
 
-        # Display the data in a table
+        st.session_state["visits_data"] = pd.DataFrame(visits_data).to_csv(index=False)
+
         st.subheader("Member Visits")
         st.dataframe(visits_data)
+
     else:
         st.info("No member visits found for the selected filters.")
 else:
