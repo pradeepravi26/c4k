@@ -25,7 +25,7 @@ if csv_file != st.session_state.csv_file:
 
 if csv_file is not None:
     df = pd.read_csv(csv_file, header=None)
-    df.columns = ["full_name", "preferred_name", "c4k_id"]
+    df.columns = ["Full Name", "Preferred Name", "C4K ID"]
     st.dataframe(df)
 
     if st.button("Validate", use_container_width=True):

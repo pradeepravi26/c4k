@@ -4,6 +4,9 @@ import datetime
 from peewee import fn
 import time
 
+if "data" not in st.session_state:
+    st.session_state["data"] = []
+
 st.title("Live Member Visits")
 
 today = datetime.date.today()
@@ -20,22 +23,22 @@ live_visits = (
 data = []
 
 if live_visits.exists():
-    data = [
-        {
-            "Full Name": visit.user.full_name,
-            "Preferred Name": visit.user.preferred_name,
-            "C4K ID": visit.user.c4k_id,
-            "Role": visit.user.role,
-            "Check-In Time": visit.in_time.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        for visit in live_visits
-    ]
-
-if data:
-    st.subheader("Members Currently Checked In")
-    st.table(data)
+    data = []
+    for visit in live_visits:
+        data.append(
+            {
+                "Full Name": visit.user.full_name,
+                "Preferred Name": visit.user.preferred_name,
+                "C4K ID": visit.user.c4k_id,
+                "Role": visit.user.role,
+                "Check-In Time": visit.in_time.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        )
+    st.session_state["data"] = data
 else:
-    st.info("No members are currently checked in.")
+    st.session_state["data"] = []
 
-time.sleep(1)
+st.subheader("Members Currently Checked In")
+st.table(st.session_state["data"])
+
 st.rerun()

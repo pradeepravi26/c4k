@@ -23,13 +23,29 @@ df = pd.DataFrame(user_data)
 edited_df = st.data_editor(
     df,
     column_config={
-        "id": st.column_config.Column(disabled=True),
+        "id": st.column_config.Column("ID", disabled=True),
         "role": st.column_config.SelectboxColumn(
             "Role",
             options=["student", "volunteer", "unassigned"],
             default="student",
             help="Select the role of the user",
             required=True,
+        ),
+        "full_name": st.column_config.TextColumn(
+            "Full Name",
+            help="Enter the full name of the user",
+        ),
+        "preferred_name": st.column_config.TextColumn(
+            "Preferred Name",
+            help="Enter the preferred name of the user",
+        ),
+        "c4k_id": st.column_config.TextColumn(
+            "C4K ID",
+            help="Enter the C4K ID of the user",
+        ),
+        "is_active": st.column_config.CheckboxColumn(
+            "Status",
+            help="Status of the user",
         ),
     },
     use_container_width=True,

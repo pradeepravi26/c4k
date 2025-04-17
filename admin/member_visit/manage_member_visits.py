@@ -72,7 +72,7 @@ if st.session_state["start_date"] and st.session_state["end_date"] and user_role
         st.session_state["visits_data"] = pd.DataFrame(visits_data).to_csv(index=False)
 
         st.subheader("Member Visits")
-        st.dataframe(visits_data)
+        st.dataframe(visits_data, height=1000)
 
     else:
         st.info("No member visits found for the selected filters.")
