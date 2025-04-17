@@ -5,7 +5,7 @@ import uuid
 
 st.title("Manage Users")
 
-users = list(User.select())
+users = list(User.select().where(User.role != "guest"))
 user_data = [
     {
         "id": str(u.id.hex),

@@ -22,10 +22,10 @@ class BaseModel(Model):
 
 class User(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
-    full_name = CharField()
-    preferred_name = CharField()
-    c4k_id = CharField()
-    role = CharField(choices=["student", "volunteer", "unassigned"])
+    full_name = CharField(null=True)
+    preferred_name = CharField(null=True)
+    c4k_id = CharField(null=True)
+    role = CharField(choices=["student", "volunteer", "unassigned", "guest"], null=True)
     is_active = BooleanField(default=True)
 
     class Meta:
@@ -35,9 +35,16 @@ class User(BaseModel):
 class MemberVisit(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     user = ForeignKeyField(User, backref="visits", on_delete="CASCADE")
-    in_time = DateTimeField()
-    out_time = DateTimeField()
-    calculated_duration = TextField()
+    in_time = DateTimeField(null=True)
+    out_time = DateTimeField(null=True)
+    calculated_duration = TextField(null=True)
 
     class Meta:
         table_name = "member_visits"
+
+
+if __name__ == "__main__":
+    db.connect()
+    db.drop_tables([User, MemberVisit], safe=True)
+    db.create_tables([User, MemberVisit], safe=True)
+    db.close()
