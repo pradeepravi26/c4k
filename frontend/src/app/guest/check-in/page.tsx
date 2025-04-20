@@ -20,59 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
 
-interface Guest {
-  id: string;
-  full_name: string;
-  role: string;
-  is_active: boolean;
-}
-
-export default function GuestCheckOut({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function GuestCheckIn() {
   const router = useRouter();
-  const [guest, setGuest] = useState<Guest | null>(null);
-  const [checkOutTime] = useState<string>(
-    format(new Date(), "yyyy-MM-dd'T'HH:mm")
-  );
-  const [loading, setLoading] = useState(true);
+  const [guestName, setGuestName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
-    null
-  );
-
-  useEffect(() => {
-    (async () => {
-      const resolved = await params;
-      setResolvedParams(resolved);
-    })();
-  }, [params]);
-
-  useEffect(() => {
-    if (!resolvedParams) return;
-
-    (async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8000/users/${resolvedParams.id}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch guest");
-        const data: Guest = await res.json();
-        setGuest(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [resolvedParams]);
 
   useEffect(() => {
     if (status !== "idle") {
@@ -92,21 +48,19 @@ export default function GuestCheckOut({
     setSubmitting(true);
 
     try {
-      if (!resolvedParams) throw new Error("Invalid parameters");
+      if (!guestName.trim()) throw new Error("Please enter your full name");
 
-      const isoTime = new Date(checkOutTime).toISOString();
-      const checkOutRes = await fetch(
-        `http://localhost:8000/guests/check-out/${
-          resolvedParams.id
-        }?check_out_time=${encodeURIComponent(isoTime)}`,
-        {
-          method: "POST",
-        }
-      );
+      const res = await fetch("http://localhost:8000/guests/check-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ full_name: guestName.trim() }),
+      });
 
-      if (!checkOutRes.ok) {
-        const errorData = await checkOutRes.json();
-        throw new Error(errorData.detail || "Check-out failed");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Check-in failed");
       }
 
       setStatus("success");
@@ -119,41 +73,36 @@ export default function GuestCheckOut({
     }
   };
 
-  if (loading || !resolvedParams) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-        <p className="text-lg">Loading guest information...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-background p-4">
       <div className="container max-w-md mx-auto py-8">
         <div className="flex items-center mb-8">
-          <Link href="/guest/check-out/search">
+          <Link href="/guest">
             <Button variant="ghost" size="icon" className="mr-2">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold">Guest Check-Out</h1>
+          <h1 className="text-3xl font-bold">Guest Check-In</h1>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>{guest?.full_name || "Guest"}</CardTitle>
-          </CardHeader>
-
           <form onSubmit={handleSubmit}>
+            <CardHeader>
+              <CardTitle>Enter Your Full Name</CardTitle>
+            </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Press the button below to check out this guest.
-              </p>
+              <Input
+                type="text"
+                placeholder="Full Name"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                required
+              />
             </CardContent>
             <div className="my-4"></div>
             <CardFooter>
               <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Checking out..." : "Check Out"}
+                {submitting ? "Checking in..." : "Check In"}
               </Button>
             </CardFooter>
           </form>
@@ -167,9 +116,9 @@ export default function GuestCheckOut({
               </DialogTitle>
               <DialogDescription>
                 {status === "success"
-                  ? "Guest has been successfully checked out. Redirecting to home page in 5 seconds."
+                  ? "Guest has been successfully checked in. Redirecting to home page in 5 seconds."
                   : errorMessage ||
-                    "There was an error checking out. Please try again."}
+                    "There was an error checking in. Please try again."}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

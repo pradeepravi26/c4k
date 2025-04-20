@@ -26,7 +26,7 @@ def read_root():
     return {"Hello": "World"}
 
 
-# student check-in search page
+# check-in search page
 @app.get("/users/check-in", response_model=List[UserOut])
 def get_users_for_check_in(role: str):
     if role not in ["student", "volunteer"]:
@@ -105,6 +105,7 @@ def check_in_user(user_id: str, check_in_time: datetime.datetime):
     return {"success": True}
 
 
+# check-out search page
 @app.get("/users/check-out", response_model=List[UserOut])
 def get_users_for_check_out(role: str):
     if role not in ["student", "volunteer"]:
@@ -147,6 +148,7 @@ def get_users_for_check_out(role: str):
     return list(users.values())
 
 
+# process check-out form submission
 @app.post("/users/check-out/{user_id}")
 def check_out_user(user_id: str, check_out_time: datetime.datetime):
     user = User.get_or_none(User.id == uuid.UUID(user_id))
@@ -205,3 +207,108 @@ def get_user_by_id(id: str):
         "role": user.role,
         "is_active": user.is_active,
     }
+
+
+@app.post("/guests/check-in")
+def check_in_guest(full_name: str = Body(..., embed=True)):
+    if not full_name:
+        raise HTTPException(status_code=400, detail="Name is required")
+
+    today = datetime.date.today()
+
+    in_time = datetime.datetime.now(local_tz)
+
+    guest_user = User.create(
+        full_name=full_name,
+        role="guest",
+    )
+
+    MemberVisit.create(
+        user=guest_user,
+        in_time=datetime.datetime.combine(today, in_time.time()),
+        out_time=None,
+        calculated_duration="",
+    )
+
+    return {"success": True}
+
+
+@app.get("/guests/check-out")
+def get_guests_for_check_out():
+    today = datetime.date.today()
+    guests = {}
+
+    for user in User.select().where((User.role == "guest") & (User.is_active)):
+        recent_visit = (
+            MemberVisit.select()
+            .where(
+                (MemberVisit.user == user)
+                & (fn.DATE(MemberVisit.in_time) == today)
+                & (MemberVisit.out_time.is_null(True))
+            )
+            .order_by(MemberVisit.in_time.desc())
+            .first()
+        )
+
+        if recent_visit:
+            guests[str(user.id.hex)] = {
+                "id": str(user.id.hex),
+                "full_name": user.full_name,
+                "preferred_name": user.preferred_name,
+                "c4k_id": user.c4k_id,
+                "role": user.role,
+                "is_active": user.is_active,
+            }
+
+    if not guests:
+        raise HTTPException(
+            status_code=404,
+            detail="No guests available for check-out.",
+        )
+
+    return list(guests.values())
+
+
+@app.post("/guests/check-out/{user_id}")
+def check_out_guest(user_id: str, check_out_time: datetime.datetime):
+    user = User.get_or_none(User.id == uuid.UUID(user_id))
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    today = datetime.date.today()
+    recent_visit = (
+        MemberVisit.select()
+        .where(
+            (MemberVisit.user == user)
+            & (fn.DATE(MemberVisit.in_time) == today)
+            & (MemberVisit.out_time.is_null(True))
+        )
+        .order_by(MemberVisit.in_time.desc())
+        .first()
+    )
+
+    if not recent_visit:
+        raise HTTPException(status_code=400, detail="User not checked in today")
+
+    check_out_time = check_out_time.astimezone()
+
+    if check_out_time < local_tz.localize(recent_visit.in_time):
+        raise HTTPException(
+            status_code=400,
+            detail="Check-out time cannot be earlier than check-in time",
+        )
+
+    now = datetime.datetime.now(local_tz)
+
+    if check_out_time > now + datetime.timedelta(minutes=5):
+        raise HTTPException(
+            status_code=400,
+            detail="Check-out time cannot be in the future",
+        )
+
+    out_time = datetime.datetime.combine(today, check_out_time.time())
+
+    recent_visit.out_time = out_time
+    recent_visit.save()
+
+    return {"success": True}
