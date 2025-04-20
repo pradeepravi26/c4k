@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from orm import User, MemberVisit
 import uuid
@@ -63,6 +63,65 @@ def get_users_by_role(role: str):
         )
 
     return list(users.values())
+
+
+@app.get("/users/validate-check-in/{user_id}")
+def validate_check_in(user_id: str):
+    user = User.get_or_none(User.id == uuid.UUID(user_id))
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    today = datetime.date.today()
+    recent_visit = (
+        MemberVisit.select()
+        .where(
+            (MemberVisit.user == user)
+            & (fn.DATE(MemberVisit.in_time) == today)
+            & (MemberVisit.out_time.is_null(True))
+        )
+        .order_by(MemberVisit.in_time.desc())
+        .first()
+    )
+
+    if recent_visit:
+        raise HTTPException(status_code=400, detail="User already checked in today")
+
+    return {"success": True}
+
+
+@app.post("/users/check-in/{user_id}")
+def check_in_user(user_id: str, check_in_time: datetime.datetime):
+    user = User.get_or_none(User.id == uuid.UUID(user_id))
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    today = datetime.date.today()
+    recent_visit = (
+        MemberVisit.select()
+        .where(
+            (MemberVisit.user == user)
+            & (fn.DATE(MemberVisit.in_time) == today)
+            & (MemberVisit.out_time.is_null(True))
+        )
+        .order_by(MemberVisit.in_time.desc())
+        .first()
+    )
+
+    if recent_visit:
+        raise HTTPException(status_code=400, detail="User already checked in today")
+
+    check_in_time = check_in_time.astimezone()
+
+    in_time = datetime.datetime.combine(today, check_in_time.time())
+
+    MemberVisit.create(
+        user=user,
+        in_time=in_time,
+        out_time=None,
+        calculated_duration="",
+    )
+
+    return {"success": True}
 
 
 @app.get("/users/{id}")

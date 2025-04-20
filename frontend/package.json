@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-dialog": "^1.1.10",
+    "@radix-ui/react-label": "^2.1.4",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.482.0",
     "next": "15.2.2",
     "react": "^19.0.0",
+    "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
@@ -29,5 +34,6 @@
     "eslint-config-next": "15.2.2",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@10.8.1+sha512.c50088ba998c67b8ca8c99df8a5e02fd2ae2e2b29aaf238feaa9e124248d3f48f9fb6db2424949ff901cffbb5e0f0cc1ad6aedb602cd29450751d11c35023677"
 }
