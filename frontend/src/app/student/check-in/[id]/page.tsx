@@ -102,14 +102,14 @@ export default function StudentCheckIn({
       if (!resolvedParams) throw new Error("Invalid parameters");
 
       // Validate check-in possibility
-      const validateRes = await fetch(
-        `http://localhost:8000/users/validate-check-in/${resolvedParams.id}`
-      );
-      if (!validateRes.ok) {
-        const errorData = await validateRes.json();
-        console.error("Validation error:", errorData.detail);
-        throw new Error(errorData.detail || "Validation failed");
-      }
+      // const validateRes = await fetch(
+      //   `http://localhost:8000/users/validate-check-in/${resolvedParams.id}`
+      // );
+      // if (!validateRes.ok) {
+      //   const errorData = await validateRes.json();
+      //   console.error("Validation error:", errorData.detail);
+      //   throw new Error(errorData.detail || "Validation failed");
+      // }
 
       const isoTime = new Date(checkInTime).toISOString();
       const checkInRes = await fetch(

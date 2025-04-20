@@ -15,7 +15,7 @@ interface Student {
   is_active: boolean;
 }
 
-export default function StudentCheckInSearch() {
+export default function StudentCheckOutSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,11 +25,12 @@ export default function StudentCheckInSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:8000/users/check-in/?role=student"
+          "http://localhost:8000/users/check-out?role=student"
         );
+        if (!res.ok) throw new Error("Failed to fetch students for checkout");
+
         const data = await res.json();
 
-        // Ensure it's an array
         if (Array.isArray(data)) {
           setAllStudents(data);
         } else {
@@ -37,7 +38,7 @@ export default function StudentCheckInSearch() {
           setAllStudents([]);
         }
       } catch (error) {
-        console.error("Failed to fetch students", error);
+        console.error("Error fetching checkout students", error);
         setAllStudents([]);
       } finally {
         setLoading(false);
@@ -66,7 +67,7 @@ export default function StudentCheckInSearch() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold">Student Check-In</h1>
+          <h1 className="text-3xl font-bold">Student Check-Out</h1>
         </div>
 
         {/* Search bar */}
@@ -84,7 +85,7 @@ export default function StudentCheckInSearch() {
         <p className="text-sm text-muted-foreground mb-4">
           {loading
             ? "Loading..."
-            : `${filteredStudents.length} student(s) found`}
+            : `${filteredStudents.length} student(s) available for check-out`}
         </p>
 
         {/* Grid of student names */}
@@ -93,7 +94,7 @@ export default function StudentCheckInSearch() {
             {filteredStudents.map((student: Student) => (
               <Link
                 key={student.id}
-                href={`/student/check-in/${student.id}`}
+                href={`/student/check-out/${student.id}`}
                 className="w-full"
               >
                 <Button
@@ -117,7 +118,7 @@ export default function StudentCheckInSearch() {
           !loading && (
             <div className="text-center py-12">
               <p className="text-xl text-muted-foreground">
-                No students available for check-in
+                No students available for check-out
               </p>
               <p className="text-sm text-muted-foreground mt-2">
                 Try a different search term
