@@ -52,7 +52,6 @@ export default function StudentCheckIn({
     null
   );
 
-  // Resolve dynamic route params
   useEffect(() => {
     (async () => {
       const resolved = await params;
@@ -60,7 +59,6 @@ export default function StudentCheckIn({
     })();
   }, [params]);
 
-  // Fetch student data
   useEffect(() => {
     if (!resolvedParams) return;
 
@@ -80,7 +78,6 @@ export default function StudentCheckIn({
     })();
   }, [resolvedParams]);
 
-  // Handle dialog open and auto-redirect on success
   useEffect(() => {
     if (status !== "idle") {
       setDialogOpen(true);
@@ -100,16 +97,6 @@ export default function StudentCheckIn({
 
     try {
       if (!resolvedParams) throw new Error("Invalid parameters");
-
-      // Validate check-in possibility
-      // const validateRes = await fetch(
-      //   `https://9757-199-111-212-77.ngrok-free.app/users/validate-check-in/${resolvedParams.id}`
-      // );
-      // if (!validateRes.ok) {
-      //   const errorData = await validateRes.json();
-      //   console.error("Validation error:", errorData.detail);
-      //   throw new Error(errorData.detail || "Validation failed");
-      // }
 
       const isoTime = new Date(checkInTime).toISOString();
       const checkInRes = await fetch(

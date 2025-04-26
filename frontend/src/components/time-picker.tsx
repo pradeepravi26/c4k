@@ -5,7 +5,7 @@ import { ClockIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface TimePickerProps {
-  value: string; // ISO string or time string depending on your use
+  value: string;
   onChange: (value: string) => void;
 }
 
@@ -23,15 +23,11 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
   });
 
   useEffect(() => {
-    // Return only the time part as "HH:mm:ss"
     onChange(time);
   }, [time]);
 
   return (
     <div>
-      {/* <Label htmlFor={id} className="text-sm font-medium mb-2 block">
-        Select Time
-      </Label> */}
       <div className="relative">
         <Input
           id={id}
