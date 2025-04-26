@@ -3,7 +3,6 @@ from orm import MemberVisit, User
 import datetime
 from peewee import fn
 
-
 if "check_in_time" not in st.session_state:
     st.session_state["check_in_time"] = datetime.datetime.now().time()
 
@@ -15,15 +14,19 @@ user_role = st.selectbox(
     label_visibility="collapsed",
 )
 
+selected_date = st.date_input(
+    "Select Date for Check-Out",
+    value=datetime.date.today(),
+)
+
 users = {}
-today = datetime.date.today()
 
 for user in User.select().where((User.role == user_role) & (User.is_active)):
     recent_visit = (
         MemberVisit.select()
         .where(
             (MemberVisit.user == user)
-            & (fn.DATE(MemberVisit.in_time) == today)
+            & (fn.DATE(MemberVisit.in_time) == selected_date)
             & (MemberVisit.out_time.is_null(True))
         )
         .order_by(MemberVisit.in_time.desc())
@@ -37,7 +40,7 @@ for user in User.select().where((User.role == user_role) & (User.is_active)):
             users[str(user.id.hex)] = f"{user.full_name} ({user.c4k_id})"
 
 if not users:
-    st.warning("No users available for check-out.")
+    st.warning("No users available for check-out on the selected date.")
     st.stop()
 
 user = st.selectbox(
@@ -53,7 +56,7 @@ recent_visit = (
     MemberVisit.select()
     .where(
         (MemberVisit.user == selected_user)
-        & (fn.DATE(MemberVisit.in_time) == today)
+        & (fn.DATE(MemberVisit.in_time) == selected_date)
         & (MemberVisit.out_time.is_null(True))
     )
     .order_by(MemberVisit.in_time.desc())
@@ -70,7 +73,7 @@ if recent_visit:
     )
 
     if check_out_time:
-        check_out_datetime = datetime.datetime.combine(today, check_out_time)
+        check_out_datetime = datetime.datetime.combine(selected_date, check_out_time)
         if check_out_datetime < recent_visit.in_time:
             st.error("Check-out time cannot be earlier than the check-in time.")
         else:
@@ -85,3 +88,5 @@ if recent_visit:
                 recent_visit.save()
                 st.success("Check-Out Successful")
                 st.balloons()
+else:
+    st.warning("No active check-in found for the selected date.")
