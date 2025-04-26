@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, AlertCircle, Home } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -67,7 +67,7 @@ export default function StudentCheckIn({
     (async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/users/${resolvedParams.id}`
+          `${process.env.FASTAPI_BASE_URL}/users/${resolvedParams.id}`
         );
         if (!res.ok) throw new Error("Failed to fetch student");
         const data: Student = await res.json();
@@ -103,7 +103,7 @@ export default function StudentCheckIn({
 
       // Validate check-in possibility
       // const validateRes = await fetch(
-      //   `http://localhost:8000/users/validate-check-in/${resolvedParams.id}`
+      //   `https://9757-199-111-212-77.ngrok-free.app/users/validate-check-in/${resolvedParams.id}`
       // );
       // if (!validateRes.ok) {
       //   const errorData = await validateRes.json();
@@ -113,7 +113,7 @@ export default function StudentCheckIn({
 
       const isoTime = new Date(checkInTime).toISOString();
       const checkInRes = await fetch(
-        `http://localhost:8000/users/check-in/${
+        `${process.env.FASTAPI_BASE_URL}/users/check-in/${
           resolvedParams.id
         }?check_in_time=${encodeURIComponent(isoTime)}`,
         {

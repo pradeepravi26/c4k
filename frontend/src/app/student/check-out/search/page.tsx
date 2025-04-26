@@ -25,7 +25,7 @@ export default function StudentCheckOutSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:8000/users/check-out?role=student"
+          `${process.env.FASTAPI_BASE_URL}/users/check-out?role=student`
         );
         if (!res.ok) throw new Error("Failed to fetch students for checkout");
 

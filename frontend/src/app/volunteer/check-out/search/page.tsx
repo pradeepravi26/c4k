@@ -25,7 +25,7 @@ export default function VolunteerCheckOutSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:8000/users/check-out?role=volunteer"
+          `${process.env.FASTAPI_BASE_URL}/users/check-out?role=volunteer`
         );
         if (!res.ok) throw new Error("Failed to fetch volunteers for checkout");
 

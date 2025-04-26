@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, AlertCircle, Home } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -65,7 +65,7 @@ export default function VolunteerCheckOut({
     (async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/users/${resolvedParams.id}`
+          `${process.env.FASTAPI_BASE_URL}/users/${resolvedParams.id}`
         );
         if (!res.ok) throw new Error("Failed to fetch volunteer");
         const data: Volunteer = await res.json();
@@ -100,7 +100,7 @@ export default function VolunteerCheckOut({
 
       const isoTime = new Date(checkOutTime).toISOString();
       const checkOutRes = await fetch(
-        `http://localhost:8000/users/check-out/${
+        `${process.env.FASTAPI_BASE_URL}/users/check-out/${
           resolvedParams.id
         }?check_out_time=${encodeURIComponent(isoTime)}`,
         {

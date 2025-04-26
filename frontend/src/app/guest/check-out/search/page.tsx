@@ -22,7 +22,9 @@ export default function GuestCheckOutSearch() {
     const fetchGuests = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8000/guests/check-out");
+        const res = await fetch(
+          `${process.env.FASTAPI_BASE_URL}/guests/check-out`
+        );
         if (!res.ok) throw new Error("Failed to fetch guests for checkout");
 
         const data = await res.json();

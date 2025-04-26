@@ -76,9 +76,12 @@ if recent_visit:
         else:
             if st.button("Check Out", use_container_width=True):
                 recent_visit.out_time = check_out_datetime
-                recent_visit.calculated_duration = str(
+                total_duration_in_seconds = (
                     check_out_datetime - recent_visit.in_time
-                )
+                ).total_seconds()
+                hours, remainder = divmod(total_duration_in_seconds, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                recent_visit.calculated_duration = f"{int(hours)}:{int(minutes):02d}"
                 recent_visit.save()
                 st.success("Check-Out Successful")
                 st.balloons()

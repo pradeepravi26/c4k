@@ -14,7 +14,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # allow_origins=[
+    #     "http://localhost:3000",
+    #     "https://7ac2-199-111-212-17.ngrok-free.app",
+    # ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -189,6 +193,12 @@ def check_out_user(user_id: str, check_out_time: datetime.datetime):
     out_time = datetime.datetime.combine(today, check_out_time.time())
 
     recent_visit.out_time = out_time
+    total_duration_in_seconds = (
+        recent_visit.out_time - recent_visit.in_time
+    ).total_seconds()
+    hours, remainder = divmod(total_duration_in_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    recent_visit.calculated_duration = f"{int(hours)}:{int(minutes):02d}"
     recent_visit.save()
 
     return {"success": True}
@@ -222,10 +232,11 @@ def check_in_guest(full_name: str = Body(..., embed=True)):
         full_name=full_name,
         role="guest",
     )
-
     MemberVisit.create(
         user=guest_user,
-        in_time=datetime.datetime.combine(today, in_time.time()),
+        in_time=datetime.datetime.combine(
+            today, (in_time - datetime.timedelta(minutes=1)).time()
+        ),
         out_time=None,
         calculated_duration="",
     )
@@ -309,6 +320,12 @@ def check_out_guest(user_id: str, check_out_time: datetime.datetime):
     out_time = datetime.datetime.combine(today, check_out_time.time())
 
     recent_visit.out_time = out_time
+    total_duration_in_seconds = (
+        recent_visit.out_time - recent_visit.in_time
+    ).total_seconds()
+    hours, remainder = divmod(total_duration_in_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    recent_visit.calculated_duration = f"{int(hours)}:{int(minutes):02d}"
     recent_visit.save()
 
     return {"success": True}

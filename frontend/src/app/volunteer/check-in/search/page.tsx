@@ -25,7 +25,7 @@ export default function VolunteerCheckInSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:8000/users/check-in/?role=volunteer"
+          `${process.env.FASTAPI_BASE_URL}/users/check-in?role=volunteer`
         );
         const data = await res.json();
 
@@ -84,7 +84,7 @@ export default function VolunteerCheckInSearch() {
         <p className="text-sm text-muted-foreground mb-4">
           {loading
             ? "Loading..."
-            : `${filteredVolunteers.length} volunteer(s) found`}
+            : `${filteredVolunteers.length} volunteer(s) available for check-in`}
         </p>
 
         {/* Grid of volunteer names */}

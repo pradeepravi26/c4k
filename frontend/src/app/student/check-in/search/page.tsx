@@ -24,9 +24,11 @@ export default function StudentCheckInSearch() {
     const fetchStudents = async () => {
       setLoading(true);
       try {
+        console.log(`Fetching students from ${process.env.FASTAPI_BASE_URL}`);
         const res = await fetch(
-          "http://localhost:8000/users/check-in/?role=student"
+          `${process.env.FASTAPI_BASE_URL}/users/check-in?role=student`
         );
+        console.log("Response from API:", res);
         const data = await res.json();
 
         // Ensure it's an array
@@ -84,7 +86,7 @@ export default function StudentCheckInSearch() {
         <p className="text-sm text-muted-foreground mb-4">
           {loading
             ? "Loading..."
-            : `${filteredStudents.length} student(s) found`}
+            : `${filteredStudents.length} student(s) available for check-in`}
         </p>
 
         {/* Grid of student names */}

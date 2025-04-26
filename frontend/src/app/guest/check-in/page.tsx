@@ -50,13 +50,16 @@ export default function GuestCheckIn() {
     try {
       if (!guestName.trim()) throw new Error("Please enter your full name");
 
-      const res = await fetch("http://localhost:8000/guests/check-in", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ full_name: guestName.trim() }),
-      });
+      const res = await fetch(
+        `${process.env.FASTAPI_BASE_URL}/guests/check-in`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ full_name: guestName.trim() }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();

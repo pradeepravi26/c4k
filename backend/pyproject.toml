@@ -9,5 +9,6 @@ dependencies = [
     "logging>=0.4.9.6",
     "peewee>=3.17.9",
     "pytz>=2025.2",
+    "starlite>=1.51.16",
     "uuid>=1.30",
 ]

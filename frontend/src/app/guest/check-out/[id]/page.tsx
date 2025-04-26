@@ -61,7 +61,7 @@ export default function GuestCheckOut({
     (async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/users/${resolvedParams.id}`
+          `${process.env.FASTAPI_BASE_URL}/users/${resolvedParams.id}`
         );
         if (!res.ok) throw new Error("Failed to fetch guest");
         const data: Guest = await res.json();
@@ -96,7 +96,7 @@ export default function GuestCheckOut({
 
       const isoTime = new Date(checkOutTime).toISOString();
       const checkOutRes = await fetch(
-        `http://localhost:8000/guests/check-out/${
+        `${process.env.FASTAPI_BASE_URL}/guests/check-out/${
           resolvedParams.id
         }?check_out_time=${encodeURIComponent(isoTime)}`,
         {
