@@ -50,6 +50,7 @@ The project has an admin, backend, and frontend component. The admin site is bui
 **Note**:
 - Change the `CORS` settings in the `backend/main.py` file to allow requests from the frontend URL.
 - The scripts folder contains a script to generate random data for the database. The data is generated using the `Faker` library. The data is generated in the `data` folder. The data is in CSV format. The data can be imported into the database using the admin site.
+- The `c4k.db` file is the SQLite database file. The database currently has fake data for testing purposes. To clear the database, delete the `c4k.db` file and run either the `orm.py` file in the `admin` or `backend` folder. This will create a new database file with the same schema as the old one, but without any data.
 
 ## Project Structure
 ```
