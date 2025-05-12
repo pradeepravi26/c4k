@@ -18,7 +18,9 @@ user_data = [
     for u in users
 ]
 
-df = pd.DataFrame(user_data)
+columns = ["id", "full_name", "preferred_name", "c4k_id", "role", "is_active"]
+
+df = pd.DataFrame(user_data if user_data else [], columns=columns)
 
 edited_df = st.data_editor(
     df,
